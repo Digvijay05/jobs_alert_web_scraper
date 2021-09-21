@@ -44,7 +44,7 @@ class Qual_List(models.Model):
         return str(self.name)
 
 
-class Post_List(models.Model):
+class Vacancy_List(models.Model):
     parent = models.CharField(max_length=400, blank=True, null=True)
     sub_parent = models.CharField(max_length=400, blank=True, null=True)
     name = models.CharField(max_length=400, blank=True, null=True)
@@ -73,7 +73,7 @@ class Related_Posts(models.Model):
         return str(self.name)
 
 
-class Job(models.Model):
+class Post(models.Model):
     post_heading = models.CharField(max_length=400, blank=True, null=True)
     name_of_the_post = models.CharField(max_length=400, blank=True, null=True)
     post_date = models.CharField(max_length=400, blank=True, null=True)
@@ -88,8 +88,9 @@ class Job(models.Model):
     age_limit_list = models.ManyToManyField(Age_Limit_List)
     qualification_list = models.ManyToManyField(Qual_List)
     vacancy_header = models.CharField(max_length=400, blank=True, null=True)
+    vacancy_rows = models.IntegerField(blank=True, null=True)
     vacancy_columns = models.ManyToManyField(Column_List)
-    vacancy_details_list = models.ManyToManyField(Post_List)
+    vacancy_details_list = models.ManyToManyField(Vacancy_List)
     important_links = models.ManyToManyField(Links_List)
     related = models.ManyToManyField(Related_Posts)
 
