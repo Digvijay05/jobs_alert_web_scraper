@@ -6,7 +6,8 @@ import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 
-from Posts.models import Qual_List, Age_Limit_List, Imp_Dates_List, Fees_List, Job, Post_List, Column_List, Links_List
+from Posts.models import Qual_List, Age_Limit_List, Imp_Dates_List, Fees_List, Post, Vacancy_List, Column_List, \
+    Links_List
 from jadavjobs_admin.settings import BASE_DIR
 
 
@@ -47,7 +48,7 @@ class Worker(webdriver.Chrome):
         self.count = 0
 
     def check_if_exists(self, json_obj):
-        self.post = Job.objects.filter(name_of_the_post=json_obj).exists()
+        self.post = Post.objects.filter(name_of_the_post=json_obj).exists()
         if self.post == False:
             return False
         return True
@@ -83,7 +84,7 @@ class Worker(webdriver.Chrome):
                 self.fe_list.append(self.fe)
         if self.js.get("VAC LIST") != None or self.js.get("VAC LIST") != []:
             for i in self.js["VAC LIST"]:
-                self.vacc = Post_List(**i)
+                self.vacc = Vacancy_List(**i)
                 self.vacc.save()
                 self.vacc_list.append(self.vacc)
         if self.js.get("IMP LINKS LIST") != None or self.js.get("IMP LINKS LIST") != []:
@@ -106,7 +107,7 @@ class Worker(webdriver.Chrome):
             "brief_info": str(self.js.get("BRIEF INFORMATION")),
             "advt_no": str(self.js.get("ADVT NO.")),
         }
-        self.ap = Job(**self.applic)
+        self.ap = Post(**self.applic)
         self.ap.save()
         self.ap.age_limit_list.add(*self.ag_list)
         self.ap.qualification_list.add(*self.qu_list)
@@ -199,19 +200,21 @@ class Worker(webdriver.Chrome):
                         break
                 for i in self.tr_list[self.vac[1]:]:
                     name = str(i.text).strip('\n')
+                    print(list(i))
                     if len(list(i)) > 3:
-                        link = i.find("a").get("href")
+                        link = i.find("a").get("href") or "Coming Soon"
                         if bool(re.search(r"^img\.freejobalert\.com.*\.pdf$", link)):
                             response = requests.get(link)
                             location = f"{BASE_DIR}\\staticfiles\\pdf"
+                            file_name = f"{name}{self.post_name}.pdf"
                             if not os.path.exists(location):
                                 os.makedirs(location)
-                            pdf = open(f"{location}\\{name}{self.post_name}.pdf")
+                            pdf = open(f"{location}\\{file_name}")
                             pdf.write(response.content)
                             pdf.close()
 
                             self.imp_links_list.append(
-                                name + "\n" + f"{location}\\{name}{self.post_name}.pdf" + "\n" + "FILE LINK")
+                                name + "\n" + f"{location}\\{file_name}" + "\n" + "FILE LINK")
 
                     self.imp_links_list.append(name + "\n" + link + "\n" + "CLICK LINK")
                 for i in self.imp_links_list:
