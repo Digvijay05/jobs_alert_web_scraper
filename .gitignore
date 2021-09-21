@@ -1,3 +1,4 @@
 venv
 .idea
 Posts/migrations
+db.sqlite3
