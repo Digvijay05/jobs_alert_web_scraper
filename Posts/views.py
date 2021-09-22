@@ -54,6 +54,17 @@ def random_post(request):
     return Response(serializer.data)
 
 
+@api_view(["DELETE"])
+def delete_all(request):
+    posts = Post.objects.all().delete()
+    serializer = PostSerializer(data=posts)
+    serializer.is_valid()
+    if serializer.validated_data == {}:
+        return Response("All Objects Deleted")
+    else:
+        return Response(serializer.validated_data)
+
+
 @api_view(["POST"])
 def worker_start(request):
     path = "D:\\PROJECTS\\Python Projects\\Api Tools\\chromedriver.exe"
@@ -61,4 +72,4 @@ def worker_start(request):
     worker = Worker(path=path, url=url)
     worker.start_application()
     worker.quit()
-    return Response(worker.applications)
+    return Response(worker.json)
