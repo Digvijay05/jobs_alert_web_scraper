@@ -7,6 +7,7 @@ urlpatterns = [
     path('links', link_list, name='link-list'),
     path('posts', post_list, name='post-list'),
     path('posts/<int:id>', post_detail, name='post-detail'),
+    path('posts/delete-all', delete_all, name='delete-all-posts'),
     path('random-post', random_post, name='random-post'),
     path('worker', worker_start, name='worker-start'),
 ]
