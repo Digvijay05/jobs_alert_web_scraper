@@ -58,7 +58,7 @@ class Links_List(models.Model):
     parent = models.CharField(max_length=400, blank=True, null=True)
     name = models.CharField(max_length=400, blank=True, null=False)
     link = models.CharField(max_length=400, blank=True, null=True)
-    download_file = models.FileField(upload_to=f"static/main/posts/uploads/%Y/%M/%D/", blank=True, null=True)
+    download_file = models.FileField(upload_to=f"staticfiles/posts/uploads/%Y/%M/%D/", blank=True, null=True)
 
     def __str__(self):
         return str(self.name)
