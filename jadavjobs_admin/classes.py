@@ -8,6 +8,7 @@ from selenium import webdriver
 
 from Posts.models import Qual_List, Age_Limit_List, Imp_Dates_List, Fees_List, Post, Vacancy_List, Column_List, \
     Links_List
+from Posts.serializers import PostSerializer
 from jadavjobs_admin.settings import BASE_DIR
 
 
@@ -117,6 +118,9 @@ class Worker(webdriver.Chrome):
         self.ap.important_links.add(*self.link_list)
         self.ap.vacancy_columns.add(*self.col_list)
         self.ap.save()
+        self.ser = PostSerializer(data=self.ap)
+        self.ser.is_valid()
+        return self.ser.validated_data
 
     def start_application(self):
         self.soup = BeautifulSoup(self.page_source, 'lxml')
@@ -174,7 +178,7 @@ class Worker(webdriver.Chrome):
                     self.td_list.append(i.text)
                 self.tr_list_cleaned = []
                 self.tr_list_clean = []
-                self.vac = []
+                self.vac = [0, 1]
                 self.vac_list = []
                 self.vac_list_cl = []
                 self.vac_list_cleaned = []
@@ -186,33 +190,35 @@ class Worker(webdriver.Chrome):
                 for i, j in enumerate(self.tr_list):
                     self.tr_list_cleaned.append(str(j.text).strip("\n").strip())
                     if str(j.text).strip("\n").strip() == "Vacancy Details":
-                        self.vac.append(i)
+                        self.vac[0] = i
                     if str(j.text).strip("\n").strip() == "Important Links":
-                        self.vac.append(i)
-                print(self.vac)
+                        self.vac[1] = i
                 for i in self.tr_list[self.vac[0]:self.vac[1]]:
                     self.vac_list.append(str(i.text).strip().strip("\n").strip())
                 for i in self.vac_list:
                     self.vac_list_cl.append(str(i).splitlines())
                 for i, j in enumerate(self.vac_list_cl):
                     if len(j) > 1:
-                        self.sub_parent_list.append(j)
+                        self.sub_parent_list = j
                         break
                 for i in self.tr_list[self.vac[1]:]:
                     name = str(i.text).strip('\n')
-                    print(list(i))
+                    link_name = str(i.text).strip('\n').split("\n")
                     if len(list(i)) > 3:
-                        link = i.find("a").get("href") or "Coming Soon"
-                        if bool(re.search(r"^img\.freejobalert\.com.*\.pdf$", link)):
+                        if i.find("a") != None:
+                            link = i.find("a").get("href")
+                        else:
+                            link = str(i.find_all("strong")[1].text).strip().strip("\n").strip()
+                        if bool(re.search(r"^https://img\.freejobalert\.com", link)):
                             response = requests.get(link)
                             location = f"{BASE_DIR}\\staticfiles\\pdf"
-                            file_name = f"{name}{self.post_name}.pdf"
+                            file_name = f"{link_name[0].lower()}{link_name[1].lower()}{self.post_name}.pdf"
                             if not os.path.exists(location):
                                 os.makedirs(location)
-                            pdf = open(f"{location}\\{file_name}")
+                            pdf = open(f"{location}\\{file_name}", "wb")
                             pdf.write(response.content)
                             pdf.close()
-
+                            print("PDF MADE FOR :-", f"{location}\\{file_name}")
                             self.imp_links_list.append(
                                 name + "\n" + f"{location}\\{file_name}" + "\n" + "FILE LINK")
 
@@ -229,7 +235,7 @@ class Worker(webdriver.Chrome):
                     elif i[-1] == "FILE LINK":
                         self.imp_links_list_cleaned.append({
                             "name": i[0],
-                            "file": i[-2],
+                            "download_file": i[-2],
                             "parent": self.post_name
                         })
                 for i in self.vac_list:
@@ -241,41 +247,25 @@ class Worker(webdriver.Chrome):
                 self.tbody_p = self.tbody.find_all("p")
                 self.p_list = []
                 self.p_list_cleaned = []
+                self.tr_post_name = ""
                 for i in self.tbody_p:
                     self.p_list.append(i.text)
 
                 for i in self.p_list:
-                    if bool(re.search(r"Vacancy", i)) or bool(re.search(r"Exam", i)) or bool(
-                            re.search(r"Job", i)) \
+                    if bool(re.search(r"Vacancy", i)) or bool(re.search(r"Exam", i)) or bool(re.search(r"Job", i)) \
                             or bool(re.search(r"Course", i)):
                         self.tr_post_name = i.strip().strip("\n").replace(r"\xa0", " ").strip()
-                    # elif bool(re.search(r"Age Limit", i)):
-                    #     pass
-                    #     # self.p_list.append(i.strip().strip("\n").replace(r"\xa0", " ").strip())
-                    # elif bool(re.search(r"Important Dates", i)):
-                    #     pass
-                    #     # self.p_list_cleaned.append(i.strip().strip("\n").replace(r"\xa0", " ").strip())
-                    # elif bool(re.search(r"Qualification", i)):
-                    #     pass
-                    #     # self.p_list_cleaned.append(i.strip().strip("\n").replace(r"\xa0", " ").strip())
-                    # elif bool(re.search(r"WWW\.FREEJOBALERT\.COM", i)) or \
-                    #         bool(re.search(r"Mobile App", i)):
-                    #     continue
-                    # else:
-                    #     pass
-                    #     # self.p_list_cleaned.append("No Match Found: " + i.strip().strip("\n").replace(r"\xa0",
-                    #     # " ").strip())
 
                 self.tbody_li = self.tbody.find_all("li")
                 self.li_list = []
                 self.li_list_cleaned = []
                 self.vac_count = 0
-                print("Vacancy List:- ", end='')
-                print(self.vac_list_cl)
-                print("Sub Parent List:- ", end='')
-                print(self.sub_parent_list)
+                # print("Vacancy List:- ", end='')
+                # print(self.vac_list_cl)
+                # print("Sub Parent List:- ", end='')
+                # print(self.sub_parent_list)
                 for i in self.vac_list_cl[1:]:
-                    print(i)
+                    # print(i)
                     if len(i) < len(self.sub_parent_list) or len(i) > len(self.sub_parent_list):
                         if bool(re.search("^Interested Candidates", i[0])):
                             continue
@@ -405,9 +395,10 @@ class Worker(webdriver.Chrome):
                 self.json_obj = json.dumps(self.applications, indent=4)
                 if self.json_obj == {} and self.applications == {}:
                     break
+                self.json = []
                 for j, i in self.applications.items():
                     self.check = self.check_if_exists(j)
                     if self.check == False:
-                        self.create_post(i)
+                        self.json.append(self.create_post(i))
                 print("COMPLETE")
                 break
