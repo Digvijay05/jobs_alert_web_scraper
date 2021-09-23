@@ -1,0 +1,1 @@
+web: gunicorn jadavjobs_admin.wsgi
