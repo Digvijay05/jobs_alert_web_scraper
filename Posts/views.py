@@ -1,3 +1,5 @@
+import random
+
 from rest_framework.decorators import api_view
 # Create your views here.
 from rest_framework.response import Response
@@ -29,10 +31,8 @@ def link_list(request):
 @api_view(["GET"])
 def post_list(request):
     posts = Post.objects.all()
-    serializer = PostSerializer(data=posts)
-    serializer.is_valid()
-    print(serializer.validated_data)
-    return Response(serializer.validated_data)
+    serializer = PostSerializer(data=posts, many=True)
+    return Response(serializer.data)
 
 
 @api_view(["GET"])
@@ -47,11 +47,12 @@ def post_detail(request):
 
 @api_view(["GET"])
 def random_post(request):
-    posts = Post.objects.all()
-    serializer = PostSerializer(data=posts)
-    serializer.is_valid()
-    print(serializer.validated_data)
-    return Response(serializer.data)
+    all = Post.objects.all()
+    serializer = PostSerializer(data=all, many=True)
+    id = int(random.randint(serializer.data[0]["id"], serializer.data[-1]["id"]))
+    post = Post.objects.get(id=id)
+    post_s = PostSerializer(post, many=False)
+    return Response(post_s.data)
 
 
 @api_view(["DELETE"])

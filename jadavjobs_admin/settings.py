@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'Posts',
     # Third-Party Apps
     'rest_framework',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -53,8 +54,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Third-Party Middleware
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
-
+CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = 'jadavjobs_admin.urls'
 
 TEMPLATES = [
@@ -126,10 +129,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'staticfiles'),
+    os.path.join(BASE_DIR, 'static'),
 )
 
-STATIC_ROOT = BASE_DIR / ""
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
