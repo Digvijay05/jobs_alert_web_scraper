@@ -213,8 +213,8 @@ class Worker(webdriver.Chrome):
                             response = requests.get(link)
                             location = f"{BASE_DIR}\\staticfiles\\pdf"
                             file_name = f"{link_name[0].lower()}{link_name[1].lower()}{self.post_name}.pdf"
-                            if not os.path.exists(location):
-                                os.makedirs(location)
+                            #if not os.path.exists(location):
+                            #    os.makedirs(location)
                             pdf = open(f"{location}\\{file_name}", "wb")
                             pdf.write(response.content)
                             pdf.close()
