@@ -118,9 +118,9 @@ class Worker(webdriver.Chrome):
         self.ap.important_links.add(*self.link_list)
         self.ap.vacancy_columns.add(*self.col_list)
         self.ap.save()
-        self.ser = PostSerializer(data=self.ap)
-        self.ser.is_valid()
-        return self.ser.validated_data
+        self.se = Post.objects.get(id=self.ap.pk)
+        self.ser = PostSerializer(self.se, many=False)
+        return self.ser.data
 
     def start_application(self):
         self.soup = BeautifulSoup(self.page_source, 'lxml')
