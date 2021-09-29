@@ -8,7 +8,6 @@ from selenium import webdriver
 
 from Posts.models import Qual_List, Age_Limit_List, Imp_Dates_List, Fees_List, Post, Vacancy_List, Column_List, \
     Links_List
-from Posts.serializers import PostSerializer
 from jadavjobs_admin.settings import BASE_DIR
 
 
@@ -107,6 +106,7 @@ class Worker(webdriver.Chrome):
             "vacancy_header": str(self.js.get("VACANCY HEADER")),
             "brief_info": str(self.js.get("BRIEF INFORMATION")),
             "advt_no": str(self.js.get("ADVT NO.")),
+            "vacancy_rows": self.js.get("VAC ROWS"),
         }
         self.ap = Post(**self.applic)
         self.ap.save()
@@ -212,7 +212,7 @@ class Worker(webdriver.Chrome):
                                 location = f"{BASE_DIR}\\staticfiles\\pdf"
                                 file_name = f"{link_name[0].lower()}{link_name[1].lower()}{self.post_name}.pdf"
                                 if not os.path.exists(location):
-                                   os.makedirs(location)
+                                    os.makedirs(location)
                                 pdf = open(f"{location}\\{file_name}", "wb")
                                 pdf.write(response.content)
                                 pdf.close()
@@ -370,7 +370,7 @@ class Worker(webdriver.Chrome):
                     "VACANCY HEADER": str(self.vacancy_header),
                     "BRIEF INFORMATION": str(self.brief_info),
                     "ADVT NO.": str(self.advt_no),
-                    "P LIST": self.p_list_cleaned,
+                    "VAC ROWS": self.vac_rows,
                     "TR POST NAME": str(self.tr_post_name),
                     "AGES LIST": self.ages_list,
                     "IMP LINKS LIST": self.imp_links_list_cleaned,
