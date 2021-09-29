@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import time
 
 import requests
 from bs4 import BeautifulSoup
@@ -120,6 +121,7 @@ class Worker(webdriver.Chrome):
         self.ap.save()
 
     def start_application(self):
+        start = time.time()
         self.soup = BeautifulSoup(self.page_source, 'lxml')
         self.div = self.soup.find_all("div", class_="listcontentj")
         for i in self.div:
@@ -400,4 +402,6 @@ class Worker(webdriver.Chrome):
                     if self.check == False:
                         self.create_post(i)
                 print("COMPLETE")
+                end = time.time()
+                print(f"{end - start}")
                 break
