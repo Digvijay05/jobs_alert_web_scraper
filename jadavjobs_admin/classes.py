@@ -204,23 +204,26 @@ class Worker(webdriver.Chrome):
                 for i in self.tr_list[self.vac[1]:]:
                     name = str(i.text).strip('\n')
                     link_name = str(i.text).strip('\n').split("\n")
-                    if len(list(i)) > 3:
-                        if i.find("a") != None:
-                            link = i.find("a").get("href")
-                        else:
-                            link = str(i.find_all("strong")[1].text).strip().strip("\n").strip()
-                        if bool(re.search(r"^https://img\.freejobalert\.com", link)):
-                            response = requests.get(link)
-                            location = f"{BASE_DIR}\\staticfiles\\pdf"
-                            file_name = f"{link_name[0].lower()}{link_name[1].lower()}{self.post_name}.pdf"
-                            #if not os.path.exists(location):
-                            #    os.makedirs(location)
-                            pdf = open(f"{location}\\{file_name}", "wb")
-                            pdf.write(response.content)
-                            pdf.close()
-                            print("PDF MADE FOR :-", f"{location}\\{file_name}")
-                            self.imp_links_list.append(
-                                name + "\n" + f"{location}\\{file_name}" + "\n" + "FILE LINK")
+                    try:
+                        if len(list(i)) > 3:
+                            if i.find("a") != None:
+                                link = i.find("a").get("href")
+                            else:
+                                link = str(i.find_all("strong")[1].text).strip().strip("\n").strip()
+                            if bool(re.search(r"^https://img\.freejobalert\.com", link)):
+                                response = requests.get(link)
+                                location = f"{BASE_DIR}\\staticfiles\\pdf"
+                                file_name = f"{link_name[0].lower()}{link_name[1].lower()}{self.post_name}.pdf"
+                                if not os.path.exists(location):
+                                   os.makedirs(location)
+                                pdf = open(f"{location}\\{file_name}", "wb")
+                                pdf.write(response.content)
+                                pdf.close()
+                                print("PDF MADE FOR :-", f"{location}\\{file_name}")
+                                self.imp_links_list.append(
+                                    name + "\n" + f"{location}\\{file_name}" + "\n" + "FILE LINK")
+                    except Exception as e:
+                        print(e)
 
                     self.imp_links_list.append(name + "\n" + link + "\n" + "CLICK LINK")
                 for i in self.imp_links_list:
