@@ -73,4 +73,4 @@ def worker_start(request):
     worker = Worker(path=path, url=url)
     worker.start_application()
     worker.quit()
-    return Response(worker.json)
+    return Response(worker.applications)

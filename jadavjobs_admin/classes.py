@@ -118,9 +118,6 @@ class Worker(webdriver.Chrome):
         self.ap.important_links.add(*self.link_list)
         self.ap.vacancy_columns.add(*self.col_list)
         self.ap.save()
-        self.se = Post.objects.get(id=self.ap.pk)
-        self.ser = PostSerializer(self.se, many=False)
-        return self.ser.data
 
     def start_application(self):
         self.soup = BeautifulSoup(self.page_source, 'lxml')
@@ -398,10 +395,9 @@ class Worker(webdriver.Chrome):
                 self.json_obj = json.dumps(self.applications, indent=4)
                 if self.json_obj == {} and self.applications == {}:
                     break
-                self.json = []
                 for j, i in self.applications.items():
                     self.check = self.check_if_exists(j)
                     if self.check == False:
-                        self.json.append(self.create_post(i))
+                        self.create_post(i)
                 print("COMPLETE")
                 break
