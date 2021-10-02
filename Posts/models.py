@@ -47,6 +47,7 @@ class Qual_List(models.Model):
 class Vacancy_List(models.Model):
     parent = models.CharField(max_length=400, blank=True, null=True)
     sub_parent = models.CharField(max_length=400, blank=True, null=True)
+    row_number = models.CharField(max_length=400, blank=True, null=True)
     name = models.CharField(max_length=400, blank=True, null=True)
     rowspan = models.CharField(max_length=400, blank=True, null=True)
 

@@ -3,37 +3,47 @@ import os
 import re
 import time
 
-import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 
 from Posts.models import Qual_List, Age_Limit_List, Imp_Dates_List, Fees_List, Post, Vacancy_List, Column_List, \
     Links_List
-from jadavjobs_admin.settings import BASE_DIR
 
 
 class Worker(webdriver.Chrome):
-    """Class for creating a webscraper for scraping job blogs."""
+    """Class for creating a web scraper for scraping job blogs.
+       Currently, it can scrape "FreeJobAlert" Website and get data of new job opportunities and reduce the hassle of
+       content creators to write all day and create one post, where this class scrapes websites and its algorithm will
+       use its creativity for bypassing plagiarism checks and use its own set of words taken from different thesauruses
+       to create brand-new posts. This all happens at a speed of 100 posts/min."""
 
     def __init__(self, **kwargs):
         """Initializing class with __init__ method,
         :argument path, url
         :url  URL """
+        # checking os name for distinguishing between my development environment vs production environment
         if os.name == "nt":
+            # sets driver path to my machine's chromedriver Path
             self.path = kwargs["path"]
             super().__init__(executable_path=self.path)
         else:
             # code for deploying on heroku
             self.chrome_options = webdriver.ChromeOptions()
+            # doesn't show new window everytime i run it on server
             self.chrome_options.add_argument("--headless")
+
             self.chrome_options.add_argument("--disable-dev-shm-usage")
             self.chrome_options.add_argument("--no-sandbox")
+            # location of chromedriver on my hosting server
             self.chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+
             super().__init__(executable_path=os.environ.get("CHROMEDRIVER_PATH"),
                              chrome_options=self.chrome_options)
-
+        # url of website to scrape
         self.url = kwargs["url"]
+        # going to url address
         self.get(self.url)
+        # Primary variables
         self.links = []
         self.post_name = ""
         self.post_date = ""
@@ -48,13 +58,16 @@ class Worker(webdriver.Chrome):
         self.applications = {}
         self.count = 0
 
+    # checking if the post already exists on database
     def check_if_exists(self, json_obj):
         self.post = Post.objects.filter(name_of_the_post=json_obj).exists()
         if self.post == False:
             return False
         return True
 
+    # Method for creating the post
     def create_post(self, json_obj):
+        # local variables required for creating a post
         self.js = dict(json_obj)
         self.qu_list = []
         self.ag_list = []
@@ -65,39 +78,47 @@ class Worker(webdriver.Chrome):
         self.col_list = []
         if self.js.get("QUALIFICATION LIST") != None or self.js.get("QUALIFICATION LIST") != []:
             for i in self.js["QUALIFICATION LIST"]:
+                # Feeding data into QualificationList Model
                 self.qu = Qual_List(**i)
                 self.qu.save()
                 self.qu_list.append(self.qu)
         if self.js.get("AGES LIST") != None or self.js.get("AGES LIST") != []:
             for i in self.js["AGES LIST"]:
+                # Feeding data into Age_Limit_List Model
                 self.ag = Age_Limit_List(**i)
                 self.ag.save()
                 self.ag_list.append(self.ag)
         if self.js.get("DATES LIST") != None or self.js.get("DATES LIST") != []:
             for i in self.js["DATES LIST"]:
+                # Feeding data into DatesList Model
                 self.dt = Imp_Dates_List(**i)
                 self.dt.save()
                 self.dt_list.append(self.dt)
         if self.js.get("FEES LIST") != None or self.js.get("FEES LIST") != []:
             for i in self.js["FEES LIST"]:
+                # Feeding data into FeesList Model
                 self.fe = Fees_List(**i)
                 self.fe.save()
                 self.fe_list.append(self.fe)
         if self.js.get("VAC LIST") != None or self.js.get("VAC LIST") != []:
             for i in self.js["VAC LIST"]:
+                # Feeding data into VacancyList Model
                 self.vacc = Vacancy_List(**i)
                 self.vacc.save()
                 self.vacc_list.append(self.vacc)
         if self.js.get("IMP LINKS LIST") != None or self.js.get("IMP LINKS LIST") != []:
             for i in self.js["IMP LINKS LIST"]:
+                # Feeding data into LinkList Model
                 self.link = Links_List(**i)
                 self.link.save()
                 self.link_list.append(self.link)
         if self.js.get("SUB PARENT LIST") != None or self.js.get("SUB PARENT LIST") != []:
             for i in self.js["SUB PARENT LIST"]:
+                # Feeding data into ColumnsList Model
                 self.col = Column_List(**i)
                 self.col.save()
                 self.col_list.append(self.col)
+        # base values required for post model
         self.applic = {
             "name_of_the_post": str(self.js.get("NAME OF THE POST")),
             "post_heading": str(self.js.get("POST HEADING")),
@@ -109,8 +130,11 @@ class Worker(webdriver.Chrome):
             "advt_no": str(self.js.get("ADVT NO.")),
             "vacancy_rows": self.js.get("VAC ROWS"),
         }
+        # Feeding all the values collected above to Post Model
         self.ap = Post(**self.applic)
+        # saving model to get id
         self.ap.save()
+        # feeding data from other models
         self.ap.age_limit_list.add(*self.ag_list)
         self.ap.qualification_list.add(*self.qu_list)
         self.ap.important_dates.add(*self.dt_list)
@@ -118,6 +142,7 @@ class Worker(webdriver.Chrome):
         self.ap.vacancy_details_list.add(*self.vacc_list)
         self.ap.important_links.add(*self.link_list)
         self.ap.vacancy_columns.add(*self.col_list)
+        # final save for Post Model
         self.ap.save()
 
     def start_application(self):
@@ -129,7 +154,7 @@ class Worker(webdriver.Chrome):
                 self.links.append(j["href"])
 
         for count, link in enumerate(self.links):
-            if self.count < 2:
+            if self.count < 20:
                 self.get(link)
                 self.implicitly_wait(30)
                 self.soup = BeautifulSoup(self.page_source, 'lxml')
@@ -137,7 +162,7 @@ class Worker(webdriver.Chrome):
                 self.post_heading = str(self.div.find("div", class_="PostMetadataHeader").text).strip().strip(
                     "\n").strip()
                 self.post_body = self.div.find("div", class_="PostContent")
-                self.vac_rows = 0
+                self.vac_rows = 1
                 self.p = self.post_body.find_all("p")
                 self.body_p_list = []
                 self.body_p_list_cleaned = []
@@ -210,17 +235,19 @@ class Worker(webdriver.Chrome):
                             else:
                                 link = str(i.find_all("strong")[1].text).strip().strip("\n").strip()
                             if bool(re.search(r"^https://img\.freejobalert\.com", link)):
-                                response = requests.get(link)
-                                location = f"{BASE_DIR}\\staticfiles\\pdf"
-                                file_name = f"{link_name[0].lower()}{link_name[1].lower()}{self.post_name}.pdf"
-                                if not os.path.exists(location):
-                                    os.makedirs(location)
-                                pdf = open(f"{location}\\{file_name}", "wb")
-                                pdf.write(response.content)
-                                pdf.close()
-                                print("PDF MADE FOR :-", f"{location}\\{file_name}")
+                                # response = requests.get(link)
+                                # location = f"{BASE_DIR}\\staticfiles\\pdf"
+                                # file_name = f"{link_name[0].lower()}{link_name[1].lower()}{self.post_name}.pdf"
+                                # if not os.path.exists(location):
+                                #     os.makedirs(location)
+                                # pdf = open(f"{location}\\{file_name}", "wb")
+                                # pdf.write(response.content)
+                                # pdf.close()
+                                # print("PDF MADE FOR :-", f"{location}\\{file_name}")
+                                # self.imp_links_list.append(
+                                #     name + "\n" + f"{location}\\{file_name}" + "\n" + "FILE LINK")
                                 self.imp_links_list.append(
-                                    name + "\n" + f"{location}\\{file_name}" + "\n" + "FILE LINK")
+                                    name + "\n" + link + "\n" + "FILE LINK")
                     except Exception as e:
                         print(e)
 
@@ -275,20 +302,24 @@ class Worker(webdriver.Chrome):
                         continue
                     elif i == self.sub_parent_list:
                         continue
-                    else:
+                    elif len(i) == len(self.sub_parent_list):
                         for j in i:
-                            if self.vac_count < len(self.sub_parent_list):
+                            if self.vac_count <= len(self.sub_parent_list):
                                 self.vac_list_cleaned.append({
                                     "parent": self.post_name,
                                     "sub_parent": self.sub_parent_list[self.vac_count],
                                     "name": str(j),
+                                    "row_number": str(self.vac_rows),
                                     "rowspan": ""
                                 })
                                 self.vac_count += 1
                             else:
                                 self.vac_rows += 1
                                 self.vac_count = 0
-                        self.vac_rows += 1
+                    else:
+                        self.vac_rows = 0
+                        # self.vac_list_cleaned[-1:-(len(self.sub_parent_list))]["row_number"] = str(self.vac_rows)
+                        # TODO: Create for loop to solve the problem of under indexing of rows
 
                 for i in self.sub_parent_list:
                     self.sub_parent_list_cleaned.append({
