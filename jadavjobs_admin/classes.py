@@ -143,7 +143,7 @@ class Worker(webdriver.Chrome):
         self.ap.save()
 
     def start_application(self):
-        start = time.time()
+        start = float(time.time())
         self.soup = BeautifulSoup(self.page_source, 'lxml')
         self.div = self.soup.find_all("div", class_="listcontentj")
         for i in self.div:
@@ -424,13 +424,12 @@ class Worker(webdriver.Chrome):
                 self.count += 1
             else:
                 self.json_obj = json.dumps(self.applications, indent=4)
-                if self.json_obj == {} and self.applications == {}:
+                if self.applications == {}:
                     break
                 for j, i in self.applications.items():
-                    self.check = self.check_if_exists(j)
-                    if self.check == False:
+                    if not self.check_if_exists(j):
                         self.create_post(i)
                 print("COMPLETE")
-                end = time.time()
-                print(f"{end - start}")
+                end = float(time.time())
+                print(f"{float(end - start)}")
                 break
