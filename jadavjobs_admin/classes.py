@@ -301,7 +301,7 @@ class Worker(webdriver.Chrome):
                         continue
                     elif len(i) == len(self.sub_parent_list):
                         for j in i:
-                            if self.vac_count < len(self.sub_parent_list):
+                            if self.vac_count + 1 < len(self.sub_parent_list):
                                 self.vac_list_cleaned.append({
                                     "parent": self.post_name,
                                     "sub_parent": self.sub_parent_list[self.vac_count],
