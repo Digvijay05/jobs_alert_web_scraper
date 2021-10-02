@@ -59,11 +59,8 @@ class Worker(webdriver.Chrome):
         self.count = 0
 
     # checking if the post already exists on database
-    def check_if_exists(self, json_obj):
-        self.post = Post.objects.filter(name_of_the_post=json_obj).exists()
-        if self.post == False:
-            return False
-        return True
+    def check_if_exists(self, name_of_the_post):
+        return Post.objects.filter(name_of_the_post=name_of_the_post).exists()
 
     # Method for creating the post
     def create_post(self, json_obj):
