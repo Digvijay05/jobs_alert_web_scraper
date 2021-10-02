@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
 from pathlib import Path
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 import django_heroku
 
@@ -88,6 +89,7 @@ DATABASES = {
         'PASSWORD': 'Dr982498@',
         'HOST': 'localhost',
         'PORT': '5432',
+        'TEST': 'mytestdatabase'
     }
 }
 
