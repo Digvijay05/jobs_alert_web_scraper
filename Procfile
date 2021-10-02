@@ -1,1 +1,1 @@
-web: gunicorn jadavjobs_admin.wsgi
+web: gunicorn jadavjobs_admin.wsgi --timeout 200 --keep-alive 20
