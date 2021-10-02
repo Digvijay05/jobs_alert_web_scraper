@@ -21,7 +21,7 @@ def api_overview(request):
 def link_list(request):
     posts = Post.objects.all().values("id", "name_of_the_post")
     url_list = {"posts": {}}
-    serializer = PostSerializer(posts)
+    serializer = PostSerializer(data=posts, many=True)
     serializer.is_valid()
     for i in serializer.validated_data:
         url_list["posts"][i["name_of_the_post"]] = f"localhost:3000/posts/{i['id']}"
