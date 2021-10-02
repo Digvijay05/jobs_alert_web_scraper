@@ -5,8 +5,8 @@ from django.test import TestCase
 class MyTest(TestCase):
     def test_api_overview(self):
         response = self.client.get("/api/")
-        self.assertEqual(response.status_code, 200)
+        return self.assertEqual(response.status_code, 200)
 
     def test_links(self):
         response = self.client.get("/api/links")
-        self.assertEqual(response.status_code, 200)
+        return self.assertEqual(response.status_code, 200)
