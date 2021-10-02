@@ -154,7 +154,7 @@ class Worker(webdriver.Chrome):
                 self.links.append(j["href"])
 
         for count, link in enumerate(self.links):
-            if self.count < 20:
+            if self.count < 10:
                 self.get(link)
                 self.implicitly_wait(30)
                 self.soup = BeautifulSoup(self.page_source, 'lxml')
