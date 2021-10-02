@@ -247,7 +247,7 @@ class Worker(webdriver.Chrome):
                                 # self.imp_links_list.append(
                                 #     name + "\n" + f"{location}\\{file_name}" + "\n" + "FILE LINK")
                                 self.imp_links_list.append(
-                                    name + "\n" + link + "\n" + "FILE LINK")
+                                    name + "\n" + link + "\n" + "CLICK LINK")
                     except Exception as e:
                         print(e)
 
