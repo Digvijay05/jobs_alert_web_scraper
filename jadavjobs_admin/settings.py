@@ -42,6 +42,10 @@ INSTALLED_APPS = [
     # Third-Party Apps
     'rest_framework',
     'corsheaders',
+    'django_crontab',
+]
+CRONJOBS = [
+    ('*/5 * * * *', 'Posts.cron.worker')
 ]
 
 MIDDLEWARE = [
