@@ -32,27 +32,73 @@ def link_list(request):
 def post_list(request):
     posts = Post.objects.all()
     serializer = PostSerializer(posts, many=True)
-    return Response(serializer.data)
+    for i, j in enumerate(posts):
+        link_serializer = Links_ListSerializer(j.important_links, many=True)
+        vacancy_details_list_serializer = Vacancy_ListPostSerializer(j.vacancy_details_list, many=True)
+        vacancy_columns_serializer = Column_ListSerializer(j.vacancy_columns, many=True)
+        qualification_list_serializer = Qual_ListSerializer(j.qualification_list, many=True)
+        age_limit_list_serializer = Age_Limit_ListSerializer(j.age_limit_list, many=True)
+        important_dates_serializer = Imp_Dates_ListSerializer(j.important_dates, many=True)
+        application_fee_serializer = Fees_ListSerializer(j.application_fee, many=True)
+        update_data = {**serializer.data[i],
+                       "important_links": link_serializer.data,
+                       "vacancy_details_list": vacancy_details_list_serializer.data,
+                       "vacancy_columns": vacancy_columns_serializer.data,
+                       "qualification_list": qualification_list_serializer.data,
+                       "age_limit_list": age_limit_list_serializer.data,
+                       "important_dates": important_dates_serializer.data,
+                       "application_fee": application_fee_serializer.data
+                       }
+    return Response(update_data)
 
 
 @api_view(["GET"])
 def post_detail(request):
-    from .urls import urlpatterns
-    url_list = {}
-    print(urlpatterns[0].pattern)
-    for i in urlpatterns:
-        url_list[str(i.pattern)] = i.name
-    return Response(url_list)
+    posts = Post.objects.all()
+    serializer = PostSerializer(posts, many=True)
+    link_serializer = Links_ListSerializer(posts.important_links, many=True)
+    vacancy_details_list_serializer = Vacancy_ListPostSerializer(posts.vacancy_details_list, many=True)
+    vacancy_columns_serializer = Column_ListSerializer(posts.vacancy_columns, many=True)
+    qualification_list_serializer = Qual_ListSerializer(posts.qualification_list, many=True)
+    age_limit_list_serializer = Age_Limit_ListSerializer(posts.age_limit_list, many=True)
+    important_dates_serializer = Imp_Dates_ListSerializer(posts.important_dates, many=True)
+    application_fee_serializer = Fees_ListSerializer(posts.application_fee, many=True)
+    update_data = {**serializer.data,
+                   "important_links": link_serializer.data,
+                   "vacancy_details_list": vacancy_details_list_serializer.data,
+                   "vacancy_columns": vacancy_columns_serializer.data,
+                   "qualification_list": qualification_list_serializer.data,
+                   "age_limit_list": age_limit_list_serializer.data,
+                   "important_dates": important_dates_serializer.data,
+                   "application_fee": application_fee_serializer.data
+                   }
+    return Response(update_data)
 
 
 @api_view(["GET"])
 def random_post(request):
     all = Post.objects.all()
-    serializer = PostSerializer(data=all, many=True)
+    serializer = PostSerializer(all, many=True)
     id = int(random.randint(serializer.data[0]["id"], serializer.data[-1]["id"]))
-    post = Post.objects.get(id=id)
-    post_s = PostSerializer(post, many=False)
-    return Response(post_s.data)
+    posts = Post.objects.get(id=id)
+    serializer_s = PostSerializer(posts, many=False)
+    link_serializer = Links_ListSerializer(posts.important_links, many=True)
+    vacancy_details_list_serializer = Vacancy_ListPostSerializer(posts.vacancy_details_list, many=True)
+    vacancy_columns_serializer = Column_ListSerializer(posts.vacancy_columns, many=True)
+    qualification_list_serializer = Qual_ListSerializer(posts.qualification_list, many=True)
+    age_limit_list_serializer = Age_Limit_ListSerializer(posts.age_limit_list, many=True)
+    important_dates_serializer = Imp_Dates_ListSerializer(posts.important_dates, many=True)
+    application_fee_serializer = Fees_ListSerializer(posts.application_fee, many=True)
+    update_data = {**serializer_s.data,
+                   "important_links": link_serializer.data,
+                   "vacancy_details_list": vacancy_details_list_serializer.data,
+                   "vacancy_columns": vacancy_columns_serializer.data,
+                   "qualification_list": qualification_list_serializer.data,
+                   "age_limit_list": age_limit_list_serializer.data,
+                   "important_dates": important_dates_serializer.data,
+                   "application_fee": application_fee_serializer.data
+                   }
+    return Response(update_data)
 
 
 @api_view(["DELETE"])
@@ -73,4 +119,4 @@ def worker_start(request):
     worker = Worker(path=path, url=url)
     worker.start_application()
     worker.quit()
-    return Response(worker.applications)
+    return Response(worker.applications, status=201)
