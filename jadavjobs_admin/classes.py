@@ -306,18 +306,12 @@ class Worker(webdriver.Chrome):
                                     "parent": self.post_name,
                                     "sub_parent": self.sub_parent_list[self.vac_count],
                                     "name": str(j),
-                                    "row_number": str(self.vac_rows),
                                     "rowspan": ""
                                 })
                                 self.vac_count += 1
-                                print(str(j) + ":-", self.vac_count)
                             else:
                                 self.vac_rows += 1
                                 self.vac_count = 0
-                    else:
-                        self.vac_rows = 0
-                        # self.vac_list_cleaned[-1:-(len(self.sub_parent_list))]["row_number"] = str(self.vac_rows)
-                        # TODO: Create for loop to solve the problem of under indexing of rows
 
                 for i in self.sub_parent_list:
                     self.sub_parent_list_cleaned.append({
