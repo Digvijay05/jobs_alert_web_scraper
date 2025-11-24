@@ -1,16 +1,9 @@
 <div id="top">
 
 <!-- HEADER STYLE: COMPACT -->
-<img src="readmeai/assets/logos/purple.svg" width="30%" align="left" style="margin-right: 15px">
 
 # JOBS_ALERT_WEB_SCRAPER.GIT
 <em>Automate job alerts. Never miss the perfect opportunity again.</em>
-
-<!-- BADGES -->
-<img src="https://img.shields.io/github/license/Digvijay05/jobs_alert_web_scraper.git?style=flat-square&logo=opensourceinitiative&logoColor=white&color=A931EC" alt="license">
-<img src="https://img.shields.io/github/last-commit/Digvijay05/jobs_alert_web_scraper.git?style=flat-square&logo=git&logoColor=white&color=A931EC" alt="last-commit">
-<img src="https://img.shields.io/github/languages/top/Digvijay05/jobs_alert_web_scraper.git?style=flat-square&color=A931EC" alt="repo-top-language">
-<img src="https://img.shields.io/github/languages/count/Digvijay05/jobs_alert_web_scraper.git?style=flat-square&color=A931EC" alt="repo-language-count">
 
 <em>Built with the tools and technologies:</em>
 
