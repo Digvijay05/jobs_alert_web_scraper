@@ -2,7 +2,7 @@
 
 <!-- HEADER STYLE: COMPACT -->
 
-# JOBS_ALERT_WEB_SCRAPER.GIT
+# JOBS Alert Web Scraper
 <em>Automate job alerts. Never miss the perfect opportunity again.</em>
 
 <em>Built with the tools and technologies:</em>
